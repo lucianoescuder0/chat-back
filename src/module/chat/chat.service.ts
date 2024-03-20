@@ -7,9 +7,14 @@ import { MessageDto } from './dto/message-dto';
 export class ChatService {
   constructor(
     private configService: ConfigService,
-  ) {}
+  ) {
+  }
 
   async messageChatGPT(messages: MessageDto[]) {
+    const messageBot = {
+      role: 'assistant',
+      content: "Lo siento, no he entendido."
+    }
     const openai = new OpenAI({
       apiKey: this.configService.get('chat.openai_api_key'),
     });
@@ -17,10 +22,10 @@ export class ChatService {
       messages,
       model: 'gpt-3.5-turbo',
     });
-    if (response.choices.length <= 0) {
-      throw new NotFoundException();
+    if (response.choices.length >= 0) {
+     messageBot.content = response.choices[0].message.content;
     }
-    return response.choices[0].message.content;
+    return messageBot;
   }
 
 }
